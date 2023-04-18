@@ -265,16 +265,16 @@ if(ANDROID)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _DEBUG)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE IS_DEBUG=1)
 endif()
 
 # Ignore warning for using "insecure" functions on Visual Studio/Windows e.g. fopen instead of fopen_s
 if(WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS=1)
 endif()
 
 if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE __ANDROID_NDK__)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USING_ANDROID_NDK=1)
 endif()
 
 if(EMSCRIPTEN)
