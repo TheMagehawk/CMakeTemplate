@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.12)    # Min Version for C++20 Support
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 if (POLICY CMP0025)
@@ -48,9 +48,9 @@ set(ASSEMBLY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/asm)
 # Set include directories
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
-set(WINDOWS_ICON_RESOURCE ${RESOURCES_DIR}/icon.rc)
-set(MODULES_LOCAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+set(LIBS_LOCAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
+set(WINDOWS_ICON_RESOURCE ${RESOURCES_DIR}/icon.rc)
 set(USE_WINDOWS_ICON TRUE)
 
 if(WIN32)
@@ -161,11 +161,11 @@ foreach(package ${NOT_FOUND_PACKAGES})
         set(BUILD_SHARED_LIBS FALSE)
     endif()
         
-    add_subdirectory(${MODULES_LOCAL_INCLUDE_DIR}/${package} EXCLUDE_FROM_ALL)
+    add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR}/${package} EXCLUDE_FROM_ALL)
 endforeach()
 
 if(HAVE_CUSTOM_CMAKE)
-    add_subdirectory(${MODULES_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
+    add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 if(ANDROID)
@@ -195,10 +195,10 @@ endif()
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${SRC_DIR}
-    ${MODULES_LOCAL_INCLUDE_DIR}
+    ${LIBS_LOCAL_INCLUDE_DIR}
     PUBLIC
     #${SRC_DIR}
-    ${MODULES_LOCAL_INCLUDE_DIR}
+    ${LIBS_LOCAL_INCLUDE_DIR}
 )
 
 if(LIBS)
