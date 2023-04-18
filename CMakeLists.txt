@@ -178,7 +178,8 @@ if(ANDROID)
 endif()
 
 list(APPEND SOURCE_FILES
-    ${SRC_DIR}/Main.cpp
+    ${SRC_DIR}/Main.cpp # C++ Example
+    #${SRC_DIR}/Main.c   # C Example
 )
 
 if(WIN32 AND USE_WINDOWS_ICON)
