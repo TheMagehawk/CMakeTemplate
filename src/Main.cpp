@@ -10,5 +10,5 @@ int main(int argc, char* argv[])
     std::cout << "Compiled C++ Example in Release mode!\n";
     #endif
 
-	return 0;
+    return 0;
 }
