@@ -1,4 +1,4 @@
-name: MacOS Build
+name: Android Build
 
 on:
   push:
@@ -11,11 +11,16 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  MacOS:
-    runs-on: macos-latest
+  Linux:
+    runs-on: ubuntu-latest
     if: False
 
     steps:
+      # Install necessary packages
+      - name: Install packages
+        shell: sh
+        run: sudo apt-get install git python3 cmake
+
       # Checkout Repository
       - name: Checkout
         uses: actions/checkout@v3.3.0
@@ -23,10 +28,10 @@ jobs:
         #with:
         #  token: ${{ secrets.REPO_TOKEN }}
         #  submodules: recursive
-      
+
       # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
       - name: Cache Submodules
-        id: CacheSubmodules
+        id: CacheStep
         uses: actions/cache@v3.2.5
         env:
           cache-name: cache-submodules-${{ runner.os }}
@@ -36,12 +41,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
-      
+            ${{ runner.os }}-
+
       # Install dependencies (Required libs to reduce compilation time)
       - name: Install dependencies
         shell: sh
-        run: brew install glfw glm assimp rapidjson
-      
+        run: |
+          sudo apt-get update
+          #sudo apt-get install -y ...
+
       # Enable Build Script to build executable
       - name: Enable Build Script
         shell: sh
@@ -51,16 +59,16 @@ jobs:
       - name: Run Build Script (Init Submodules)
         if: steps.CacheStep.outputs.cache-hit != 'true'
         shell: sh
-        run: ${{github.workspace}}/build.sh --release
+        run: ${{github.workspace}}/build.sh --release --android
 
       # Run Build Script (Skip Init Submodules)
       - name: Run Build Script (Skip Init Submodules)
         if: steps.CacheStep.outputs.cache-hit == 'true'
         shell: sh
-        run: ${{github.workspace}}/build.sh --release --skip-submodules
+        run: ${{github.workspace}}/build.sh --release --skip-submodules --android
 
       # Execute tests defined by the CMake configuration.
       - name: Run CTest
         shell: sh
-        working-directory: ${{github.workspace}}/build/amd64/Release/
+        working-directory: ${{github.workspace}}/build/android/Release/
         run: ctest -C ${{env.BUILD_TYPE}}
