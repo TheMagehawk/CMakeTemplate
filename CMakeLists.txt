@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.12)    # Min Version for C++20 Support
 
-set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+# Set Policies to use new behaviour
 if (POLICY CMP0025)
     cmake_policy(SET CMP0025 NEW)
 endif ()
+if (POLICY CMP0067)
+    cmake_policy(SET CMP0067 NEW)
+endif()
+if (POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW)
+endif()
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -38,6 +45,7 @@ endif()
 set(PROJECT_NAME "CMakeTemplate")
 set(PROJECT_VERSION 0.1.0)
 set(PROJECT_DESCRIPTION "A flexible, extensible and cross-platform CMake Template")
+set(PROJECT_URL "https://github.com/TheMagehawk/CMakeTemplate.git")
 
 # Set output directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -51,13 +59,13 @@ set(RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(LIBS_LOCAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 set(WINDOWS_ICON_RESOURCE ${RESOURCES_DIR}/icon.rc)
-set(USE_WINDOWS_ICON TRUE)
+option(USE_WINDOWS_ICON "Apply Icon on Windows Executable" ON)
 
 if(WIN32)
     set(WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif()
 
-project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} DESCRIPTION ${PROJECT_DESCRIPTION} LANGUAGES CXX C)
+project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} DESCRIPTION ${PROJECT_DESCRIPTION} HOMEPAGE_URL ${PROJECT_URL} LANGUAGES CXX C)
 
 if(APPLE)
     enable_language(OBJC)
@@ -78,14 +86,16 @@ message("")
 set(BUILD_SHARED_LIBS FALSE)
 set(POSITION_INDEPENDENT_CODE TRUE)
 
+#### <---- ADD ALL EXTERNAL DEPENDENCIES (INCLUDING CUSTOM) HERE ----> ####
 list(APPEND LIBS "")
 list(APPEND LIBS_MINIMUM_VERSION "")
 list(APPEND LIBS_SHARED "")	# Mainly for LGPL-Licensed Libraries
 list(APPEND FOUND_PACKAGES "")
 list(APPEND NOT_FOUND_PACKAGES "")
 
-set(HAVE_CUSTOM_CMAKE FALSE)    # Custom CMake Targets written in a custom CMakeLists.txt in the external directory
-list(APPEND LIBS_CUSTOM_CMAKE "")
+#### <---- ADD CUSTOM DEPENDENCIES HERE ----> ####
+option(HAVE_CUSTOM_CMAKE "Custom CMake Targets written in a custom CMakeLists.txt in the external directory" ON)
+list(APPEND LIBS_CUSTOM_CMAKE "")   # Specify which CMake Targets are defined inside the custom CMakeLists.txt
 
 if(NOT ANDROID)
     list(APPEND LIBS "")
@@ -169,6 +179,7 @@ if(HAVE_CUSTOM_CMAKE)
 endif()
 
 if(ANDROID)
+    message("Android: Searching NDK Library \"log\"...")
     find_library( # Sets the name of the path variable.
             log-lib
 
@@ -180,6 +191,8 @@ endif()
 list(APPEND SOURCE_FILES
     ${SRC_DIR}/Main.cpp # C++ Example
     #${SRC_DIR}/Main.c   # C Example
+
+    #### <---- ADD YOUR OWN SOURCE FILES HERE ----> ####
 )
 
 if(WIN32 AND USE_WINDOWS_ICON)
