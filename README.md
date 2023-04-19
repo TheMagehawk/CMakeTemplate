@@ -21,6 +21,11 @@ The target name for each dependency needs to be addressed in the CMakeLists.txt:
 
 Additional flags or variables can be set directly in the Root CMakeLists.txt!
 
+### Continuous integration
+
+This Template is provided with Github Workflow Jobs to automate compilation.<br>
+To enable the jobs remove `if: False` or replace it with `if: True` for each desired job.
+
 ## Build
 ### Visual Studio
 
