@@ -10,7 +10,7 @@ set GREEN=%ESC%[32m
 set YELLOW=%ESC%[33m
 set BLUE=%ESC%[34m
 set MAGENTA=%ESC%[35m
-set LCYAN=%ESC%[36m
+set CYAN=%ESC%[36m
 set WHITE=%ESC%[37m
 
 set LBLACK=%ESC%[30;1m
@@ -256,11 +256,11 @@ echo     --skip-submodules          Skip the submodules command
 echo     --skip-configure           Skip the cmake configure command
 echo     -c --clean                 Clean the output directory (including debug and release)
 echo     --clean-native             Clean the native build directories
-echo     --clean-android            Clean the Android build directories
 echo     --clean-release            Clean the release directory
 echo     --clean-debug              Clean the debug directory
+echo     --clean-android            Clean the Android build directories
 echo     --clean-android-release    Clean the Android release directory
-echo     --clean-android-debug      Clean the debug directory
+echo     --clean-android-debug      Clean the Android debug directory
 echo;
 goto:eof
 
