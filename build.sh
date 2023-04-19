@@ -24,6 +24,7 @@ usage() {
         --release              Build in Release mode (default)
         --android              Build for Android
         --amd64                Build for amd64 (x86_64) (default)
+        --emscripten           Build for Emscripten (Web)
         --sync                 Force the sync of submodules
         -s --skip-all          Just run the cmake build command (Skip submodules and cmake configure command)
         --skip-submodules      Skip the submodules command
@@ -71,7 +72,9 @@ while [ -n "$1" ]; do
         --android)
             ARCH="android"
             ANDROID=true
+            EMSCRIPTEN=false
             case "$2" in 
+                -*) ;;
                 "") ANDROID_NDK_PATH=/opt/android-ndk ; shift ;;
                  *) ANDROID_NDK_PATH=$2 ; shift ;;
             esac
@@ -79,6 +82,17 @@ while [ -n "$1" ]; do
         --amd64)
             ARCH="amd64"
             ANDROID=false
+            EMSCRIPTEN=false
+            ;;
+        --emscripten)
+            ARCH="emscripten"
+            ANDROID=false
+            EMSCRIPTEN=true
+            case "$2" in
+                -*) printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
+                "") printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
+                 *) EMSCRIPTEN_PATH=$2 ; shift ;;
+            esac
             ;;
         --cmake-flags)
             shift
@@ -146,8 +160,14 @@ if [ $SYNC ]; then
 fi
 if [ ! "$SKIP_CONFIGURE" ]; then
     printf "Configuring CMake Build Files...\n"
-    cmake -E time cmake -S . -B ${BUILD_DIRECTORY} -DCOMPILE_LIBS="${COMPILE_LIBS}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+    if [ $EMSCRIPTEN ]; then
+        source ${EMSCRIPTEN_PATH}/emsdk_env.sh
+        emcmake cmake -E time cmake -S . -B ${BUILD_DIRECTORY} -DCOMPILE_LIBS="${COMPILE_LIBS}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
         -DCMAKE_BUILD_ANDROID=${ANDROID} -DCMAKE_ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
+    else
+        cmake -E time cmake -S . -B ${BUILD_DIRECTORY} -DCOMPILE_LIBS="${COMPILE_LIBS}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+        -DCMAKE_BUILD_ANDROID=${ANDROID} -DCMAKE_ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
+    fi
 fi
 
 cd "${BUILD_DIRECTORY}" || exit 1
