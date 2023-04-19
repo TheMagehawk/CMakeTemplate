@@ -1,0 +1,226 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  Linux:
+    runs-on: ubuntu-latest
+    if: False
+
+    steps:
+      # Checkout Repository
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+
+      # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
+      - name: Cache Submodules
+        id: CacheStep
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-submodules-${{ runner.os }}
+        with:
+          path: ${{github.workspace}}/modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      # Install dependencies (Required libs to reduce compilation time)
+      - name: Install dependencies
+        shell: sh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xorg-dev pkg-config cmake-data libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libglfw3-dev libglm-dev libassimp-dev libtinyxml2-dev rapidjson-dev  
+
+      # Enable Build Script to build executable
+      - name: Enable Build Script
+        shell: sh
+        run: chmod +x ${{github.workspace}}/build.sh
+
+      # Run Build Script (Init Submodules)
+      - name: Run Build Script (Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit != 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release
+
+      # Run Build Script (Skip Init Submodules)
+      - name: Run Build Script (Skip Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit == 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release --skip-submodules
+
+      # Execute tests defined by the CMake configuration.
+      - name: Run CTest
+        shell: sh
+        working-directory: ${{github.workspace}}/build/amd64/Release/
+        run: ctest -C ${{env.BUILD_TYPE}}
+    
+  Windows:
+    runs-on: windows-latest
+    if: False
+
+    env:
+      VS_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+      MSBUILD_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\
+    steps:
+      # Checkout Repository
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          submodules: recursive
+        
+      # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
+      - name: Cache Submodules
+        id: CacheStep
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-submodules-${{ runner.os }}
+        with:
+          path: ${{github.workspace}}/modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      # Run Build Script (Init Submodules)
+      - name: Run Build Script (Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit != 'true'
+        shell: powershell
+        run: ${{github.workspace}}/build.bat --release
+        
+      # Run Build Script (Skip Init Submodules)
+      - name: Run Build Script (Skip Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit == 'true'
+        shell: powershell
+        run: ${{github.workspace}}/build.bat --release --skip-submodules
+
+      # Execute tests defined by the CMake configuration.
+      - name: Run CTest
+        shell: powershell
+        working-directory: ${{github.workspace}}/out/build/x64-release/
+        run: ctest -C ${{env.BUILD_TYPE}}
+  
+  MacOS:
+    runs-on: macos-latest
+    if: False
+    
+    steps:
+      # Checkout Repository
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          submodules: recursive
+      
+      # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
+      - name: Cache Submodules
+        id: CacheSubmodules
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-submodules-${{ runner.os }}
+        with:
+          path: ${{github.workspace}}/modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+
+      # Cache dependencies
+      - name: Cache Dependencies
+        id: CacheDependencies
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-dependencies-${{ runner.os }}
+        with:
+          path: /usr/local/Cellar
+          key: ${{ runner.os }}-build-dependencies-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            ${{ runner.os }}-build-dependencies-${{ env.cache-name }}-
+            ${{ runner.os }}-build-dependencies-
+      
+      # Install dependencies (Required libs to reduce compilation time)
+      - name: Install dependencies
+        shell: sh
+        run: brew install glfw glm assimp rapidjson
+      
+      # Enable Build Script to build executable
+      - name: Enable Build Script
+        shell: sh
+        run: chmod +x ${{github.workspace}}/build.sh
+
+      # Run Build Script (Init Submodules)
+      - name: Run Build Script (Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit != 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release
+
+      # Run Build Script (Skip Init Submodules)
+      - name: Run Build Script (Skip Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit == 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release --skip-submodules
+
+      # Execute tests defined by the CMake configuration.
+      - name: Run CTest
+        shell: sh
+        working-directory: ${{github.workspace}}/build/amd64/Release/
+        run: ctest -C ${{env.BUILD_TYPE}}
+        
+  Emscripten:
+    runs-on: ubuntu-latest
+    if: False
+    
+    steps:   
+      # Install packages
+      - name: Install packages
+        shell: sh
+        run: sudo apt-get install git python3 cmake
+        
+      # Install emsdk
+      - name: Install emsdk
+        shell: sh
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
+          ~/emsdk/emsdk install latest
+          ~/emsdk/emsdk activate latest
+          source ~/emsdk/emsdk_env.sh
+          
+      # Checkout Repository
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          submodules: recursive
+          
+      # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
+      - name: Cache Submodules
+        id: CacheStep
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-submodules-github.job
+        with:
+          path: ${{github.workspace}}/modules
+          key: github.job-build-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            github.job-build-${{ env.cache-name }}-
+            github.job-build-
+            github.job-
+
+      # Init Submodules if not cached
+      - name: Init Submodules (If not cached)
+        if: steps.CacheStep.outputs.cache-hit != 'true'
+        shell: sh
+        run: |
+          git submodule update --init --recursive
+          git submodule update --remote --recursive

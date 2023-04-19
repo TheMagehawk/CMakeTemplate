@@ -1,0 +1,65 @@
+name: MacOS Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  MacOS:
+    runs-on: macos-latest
+    if: False
+
+    steps:
+      # Checkout Repository
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          submodules: recursive
+      
+      # Cache Submodules Handler (Reuse submodules from last run to speed up workflow)
+      - name: Cache Submodules
+        id: CacheSubmodules
+        uses: actions/cache@v3.2.5
+        env:
+          cache-name: cache-submodules-${{ runner.os }}
+        with:
+          path: ${{github.workspace}}/modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+      
+      # Install dependencies (Required libs to reduce compilation time)
+      - name: Install dependencies
+        shell: sh
+        run: brew install glfw glm assimp rapidjson
+      
+      # Enable Build Script to build executable
+      - name: Enable Build Script
+        shell: sh
+        run: chmod +x ${{github.workspace}}/build.sh
+
+      # Run Build Script (Init Submodules)
+      - name: Run Build Script (Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit != 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release
+
+      # Run Build Script (Skip Init Submodules)
+      - name: Run Build Script (Skip Init Submodules)
+        if: steps.CacheStep.outputs.cache-hit == 'true'
+        shell: sh
+        run: ${{github.workspace}}/build.sh --release --skip-submodules
+
+      # Execute tests defined by the CMake configuration.
+      - name: Run CTest
+        shell: sh
+        working-directory: ${{github.workspace}}/build/amd64/Release/
+        run: ctest -C ${{env.BUILD_TYPE}}
