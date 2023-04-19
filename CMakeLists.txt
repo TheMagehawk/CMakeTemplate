@@ -271,10 +271,10 @@ if(${Threads_FOUND})
     )
 endif()
 
-    target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        ${CMAKE_DL_LIBS}
-    )
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_DL_LIBS}
+)
 
 if(ANDROID)
     target_link_libraries(${PROJECT_NAME}
@@ -284,6 +284,14 @@ if(ANDROID)
         EGL
         GLESv3
     )
+elseif(WIN32)
+    # Hide Console for Windows
+    if(HIDE_CONSOLE)
+        message("")
+        message("WinMain Entry for GUI only executable (Hiding Console)")
+        set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE 1)
+        target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup)
+    endif()
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
