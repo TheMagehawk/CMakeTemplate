@@ -171,10 +171,18 @@ foreach(package ${NOT_FOUND_PACKAGES})
         set(BUILD_SHARED_LIBS FALSE)
     endif()
         
+    if(NOT EXISTS ${LIBS_LOCAL_INCLUDE_DIR}/${package} OR NOT IS_DIRECTORY ${LIBS_LOCAL_INCLUDE_DIR}/${package})
+        message(FATAL_ERROR "${package} doesn't exist in ${LIBS_LOCAL_INCLUDE_DIR}/${package}! Maybe git submodules need to be initialized?")
+    endif()
+
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR}/${package} EXCLUDE_FROM_ALL)
 endforeach()
 
 if(HAVE_CUSTOM_CMAKE)
+    if(NOT EXISTS ${LIBS_LOCAL_INCLUDE_DIR} OR NOT IS_DIRECTORY ${LIBS_LOCAL_INCLUDE_DIR})
+        message(FATAL_ERROR "Directory for custom CMake Targets doesn't exist: ${LIBS_LOCAL_INCLUDE_DIR}")
+    endif()
+
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
 endif()
 
