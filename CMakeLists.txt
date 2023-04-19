@@ -84,7 +84,7 @@ list(APPEND LIBS_SHARED "")	# Mainly for LGPL-Licensed Libraries
 list(APPEND FOUND_PACKAGES "")
 list(APPEND NOT_FOUND_PACKAGES "")
 
-set(HAVE_CUSTOM_CMAKE FALSE)
+set(HAVE_CUSTOM_CMAKE FALSE)    # Custom CMake Targets written in a custom CMakeLists.txt in the external directory
 list(APPEND LIBS_CUSTOM_CMAKE "")
 
 if(NOT ANDROID)
