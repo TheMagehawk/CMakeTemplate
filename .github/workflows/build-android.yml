@@ -11,16 +11,14 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  Linux:
-    runs-on: ubuntu-latest
+  Android:
+    runs-on: windows-latest
+    env:
+      VS_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+      MSBUILD_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\
     if: False
 
     steps:
-      # Install necessary packages
-      - name: Install packages
-        shell: sh
-        run: sudo apt-get install git python3 cmake
-
       # Checkout Repository
       - name: Checkout
         uses: actions/checkout@v3.3.0
@@ -43,32 +41,20 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      # Install dependencies (Required libs to reduce compilation time)
-      - name: Install dependencies
-        shell: sh
-        run: |
-          sudo apt-get update
-          #sudo apt-get install -y ...
-
-      # Enable Build Script to build executable
-      - name: Enable Build Script
-        shell: sh
-        run: chmod +x ${{github.workspace}}/build.sh
-
       # Run Build Script (Init Submodules)
       - name: Run Build Script (Init Submodules)
         if: steps.CacheStep.outputs.cache-hit != 'true'
-        shell: sh
-        run: ${{github.workspace}}/build.sh --release --android
+        shell: powershell
+        run: ${{github.workspace}}/build.bat --release --android
 
       # Run Build Script (Skip Init Submodules)
       - name: Run Build Script (Skip Init Submodules)
         if: steps.CacheStep.outputs.cache-hit == 'true'
-        shell: sh
-        run: ${{github.workspace}}/build.sh --release --skip-submodules --android
+        shell: powershell
+        run: ${{github.workspace}}/build.bat --release --skip-submodules --android
 
       # Execute tests defined by the CMake configuration.
       - name: Run CTest
-        shell: sh
-        working-directory: ${{github.workspace}}/build/android/Release/
+        shell: powershell
+        working-directory: ${{github.workspace}}/out/build/Android/arm-release
         run: ctest -C ${{env.BUILD_TYPE}}
