@@ -23,7 +23,11 @@ if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
     if(NOT ANDROID_NDK_PATH)
         message("No Android NDK Path set! Using environment variable: " $ENV{ANDROID_NDK_HOME})
         set(ANDROID_NDK_PATH $ENV{ANDROID_NDK_HOME})
-        STRING(REGEX REPLACE "\\\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH} )
+        if(ANDROID_NDK_PATH)
+            STRING(REGEX REPLACE "\\\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH} )
+        else()
+            message(FATAL_ERROR "No Android NDK Path specified!")
+        endif()
     endif()
 endif()
 
@@ -203,6 +207,11 @@ list(APPEND SOURCE_FILES
     #### <---- ADD YOUR OWN SOURCE FILES HERE ----> ####
 )
 
+# Compile HTML File for Emscripten Builds
+if(EMSCRIPTEN)
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
+
 if(WIN32 AND USE_WINDOWS_ICON)
     add_executable(${PROJECT_NAME}
         ${SOURCE_FILES}
@@ -307,9 +316,9 @@ if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE USING_ANDROID_NDK=1)
 endif()
 
-if(EMSCRIPTEN)
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} "-s EMCC_DEBUG=1")
-endif()
+# if(EMSCRIPTEN)
+#     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} "-s EMCC_DEBUG=1")
+# endif()
 
 # Set C++ Version for target/executable
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
