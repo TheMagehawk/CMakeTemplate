@@ -10,5 +10,10 @@ int main(int argc, char* argv[])
     std::cout << "Compiled C++ Example in Release mode!\n";
     #endif
 
+    if (argc > 1) 
+    {
+        std::cout << "Running Test " << argv[1] << "..." << '\n';
+    }
+
     return 0;
 }
