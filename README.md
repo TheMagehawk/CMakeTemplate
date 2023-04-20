@@ -1,5 +1,13 @@
+<div align="center">
+
 # CMakeTemplate
-A flexible, extensible and cross-platform CMake Template to compile small and large C and C++ Projects
+
+[![Repo Size](https://img.shields.io/github/repo-size/TheMagehawk/CMakeTemplate)](https://github.com/TheMagehawk/CMakeTemplate)
+[![License](https://img.shields.io/github/license/TheMagehawk/CMakeTemplate)](https://github.com/TheMagehawk/CMakeTemplate/blob/master/LICENSE)
+
+A flexible, extensible and cross-platform <b>CMake Template</b> to compile small and large C and C++ Projects
+
+</div>
 
 ## Usage
 ### Setup
