@@ -6,7 +6,7 @@ NC='\033[0m'
 ARCH="amd64"
 BUILD_TYPE="Release"
 BUILD_DIRECTORY_ROOT="build"
-BIN_NAME="NamelessGame"
+BIN_NAME="CMakeTemplate"
 ROOT_DIR="$PWD"
 usage() {
     cat <<USAGE
@@ -25,6 +25,7 @@ usage() {
         --android              Build for Android
         --amd64                Build for amd64 (x86_64) (default)
         --emscripten           Build for Emscripten (Web)
+        --emscripten-custom    Build for Emscripten (Web) - Custom Emscripten Path
         --sync                 Force the sync of submodules
         -s --skip-all          Just run the cmake build command (Skip submodules and cmake configure command)
         --skip-submodules      Skip the submodules command
@@ -51,9 +52,8 @@ link() {
 
 [ "$(uname)" = "Linux" ] && TEMP=$(getopt -n "$0" -o rhcsl \
 --long run,sync,help,clean,skip-all,skip-submodules,skip-configure,link,link-now,run-now,debug,release,\
-cmake-flags:,force-compile-libs,amd64,use-shared,android:: \
--- "$@")
-eval set -- "$TEMP"
+cmake-flags:,force-compile-libs,amd64,use-shared,android,emscripten,emscripten-custom:: \
+-- "$@") && eval set -- "$TEMP"
 
 while [ -n "$1" ]; do
     case $1 in 
@@ -73,8 +73,8 @@ while [ -n "$1" ]; do
             ARCH="android"
             ANDROID=true
             EMSCRIPTEN=false
-            case "$2" in 
-                -*) ;;
+            case "$2" in
+                -*) ANDROID_NDK_PATH=/opt/android-ndk ;;
                 "") ANDROID_NDK_PATH=/opt/android-ndk ; shift ;;
                  *) ANDROID_NDK_PATH=$2 ; shift ;;
             esac
@@ -88,10 +88,16 @@ while [ -n "$1" ]; do
             ARCH="emscripten"
             ANDROID=false
             EMSCRIPTEN=true
-            case "$2" in
-                -*) printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
-                "") printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
-                 *) EMSCRIPTEN_PATH=$2 ; shift ;;
+            EMSCRIPTEN_SYSTEM=true
+            ;;    
+        --emscripten-custom)
+            ARCH="emscripten"
+            ANDROID=false
+            EMSCRIPTEN=true
+            case $2 in
+                -*)     printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
+                "")     printf "%bNeed to specify Path to Emscripten!%b\n" "$RED" "$NC" ; exit 1 ;;
+                 *)     EMSCRIPTEN_PATH=$2 ; shift ;;
             esac
             ;;
         --cmake-flags)
@@ -161,12 +167,14 @@ fi
 if [ ! "$SKIP_CONFIGURE" ]; then
     printf "Configuring CMake Build Files...\n"
     if [ $EMSCRIPTEN ]; then
-        source ${EMSCRIPTEN_PATH}/emsdk_env.sh
+        if [ ! $EMSCRIPTEN_SYSTEM ]; then
+            source ${EMSCRIPTEN_PATH}/emsdk_env.sh
+        fi
         emcmake cmake -E time cmake -S . -B ${BUILD_DIRECTORY} -DCOMPILE_LIBS="${COMPILE_LIBS}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-        -DCMAKE_BUILD_ANDROID=${ANDROID} -DCMAKE_ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
+        -DCMAKE_BUILD_ANDROID=${ANDROID} -DANDROID_NDK_PATH=${ANDROID_NDK_PATH}
     else
         cmake -E time cmake -S . -B ${BUILD_DIRECTORY} -DCOMPILE_LIBS="${COMPILE_LIBS}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-        -DCMAKE_BUILD_ANDROID=${ANDROID} -DCMAKE_ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
+        -DCMAKE_BUILD_ANDROID=${ANDROID} -DANDROID_NDK_PATH=${ANDROID_NDK_PATH}
     fi
 fi
 
