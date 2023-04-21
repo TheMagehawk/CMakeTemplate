@@ -47,7 +47,7 @@ To enable the jobs remove `if: False` or replace it with `if: True` for each des
 #### :penguin: Linux:
 - Run `chmod +x build.sh && ./build.sh [FLAGS]`
 
-#### :window: Windows:
+#### :framed_picture: Windows:
 - Run `./build.bat [FLAGS]`
 
 #### :apple: MacOS:
