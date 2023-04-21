@@ -9,13 +9,13 @@ A flexible, extensible and cross-platform <b>CMake Template</b> to compile small
 
 </div>
 
-## Usage
-### Setup
+## :information_source: Usage
+### :bricks: Setup
 
 Create a new repository from the Template on Github:  
 `git clone https://github.com/TheMagehawk/CMakeTemplate.git`
 
-### Configuration
+### :gear: Configuration
 
 Now you can write custom source files in the `src` directory.
 Source files need to be added in the CMakeLists.txt:
@@ -29,38 +29,38 @@ The target name for each dependency needs to be addressed in the CMakeLists.txt:
 
 Additional flags or variables can be set directly in the Root CMakeLists.txt!
 
-### Continuous integration
+### :arrows_counterclockwise: Continuous integration
 
 This Template is provided with Github Workflow Jobs to automate compilation.<br>
 To enable the jobs remove `if: False` or replace it with `if: True` for each desired job.
 
-## Build
-### Visual Studio
+## :hammer_and_wrench: Build
+### :vs: Visual Studio
 
 - Initialize and update all submodules in this project (including external modules/dependencies):  
  `git submodule update --init --recursive --depth=1`
 - Configure the CMake Project (and delete and regenerate Cache if needed or error)
 - Run one of the available Configurations
 
-### Command Line
+### :printer: Command Line
 
-#### Linux:
+#### :penguin: Linux:
 - Run `chmod +x build.sh && ./build.sh [FLAGS]`
 
-#### Windows:
+#### :window: Windows:
 - Run `./build.bat [FLAGS]`
 
-#### MacOS:
+#### :apple: MacOS:
 - Run `chmod +x build.sh && ./build.sh [FLAGS]`
 
-#### Android (Experimental right now):
+#### :robot: Android (Experimental right now):
 - Cross Compile on **Windows:**<br/>
 `./build.bat --android [NDK_PATH]`
 - Cross Compile on **Linux:**<br/>
 `./build.sh --android [NDK_PATH]`
 
-#### iOS:
+#### :green_apple: iOS:
 - Maybe someday...
 
-### Configuration/Build Flags
+### :triangular_flag_on_post: Configuration/Build Flags
 `./build.sh --help` or `./build.bat --help` as flags to print out all available build flags
