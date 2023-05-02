@@ -210,6 +210,15 @@ if(HAVE_CUSTOM_CMAKE)
 
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
 endif()
+    
+# Use pthread on Unix-like Systems
+if(PREFER_PTHREAD)
+    if(UNIX)
+        set(THREADS_PREFER_PTHREAD_FLAG ON)
+    endif()
+endif()
+
+find_package(Threads QUIET)
 
 # Search Android specific Libraries
 if(ANDROID)
@@ -286,12 +295,7 @@ foreach(package ${NOT_FOUND_PACKAGES})
     )
 endforeach()
 
-if(UNIX)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-endif()
-
-find_package(Threads QUIET)
-
+# Link Threading Library if found
 if(${Threads_FOUND})
     target_link_libraries(${PROJECT_NAME}
         PRIVATE
