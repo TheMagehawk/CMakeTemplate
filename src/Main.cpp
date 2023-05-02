@@ -2,16 +2,16 @@
 
 int main(int argc, char* argv[])
 {
-    std::cout << "CMakeTemplate by Magehawk!\n" << "Github Repository: https://github.com/TheMagehawk/CMakeTemplate.git\n\n";
+    std::cout << "CMakeTemplate by Magehawk!\n"
+              << "Github Repository: https://github.com/TheMagehawk/CMakeTemplate.git\n\n";
 
-    #ifdef IS_DEBUG
+#ifdef IS_DEBUG
     std::cout << "Compiled C++ Example in Debug mode!\n";
-    #else
+#else
     std::cout << "Compiled C++ Example in Release mode!\n";
-    #endif
+#endif
 
-    if (argc > 1) 
-    {
+    if (argc > 1) {
         std::cout << "Running Test " << argv[1] << "..." << '\n';
     }
 
