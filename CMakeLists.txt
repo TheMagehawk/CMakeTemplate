@@ -24,8 +24,11 @@ if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
     if(NOT ANDROID_NDK_PATH)
         message("No Android NDK Path set! Using environment variable: " $ENV{ANDROID_NDK_HOME})
         set(ANDROID_NDK_PATH $ENV{ANDROID_NDK_HOME})
+
         if(ANDROID_NDK_PATH)
+            # Replace Backslashes in NDK Path
             STRING(REGEX REPLACE "\\\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH} )
+            STRING(REGEX REPLACE "\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH})
         else()
             message(FATAL_ERROR "No Android NDK Path specified!")
         endif()
