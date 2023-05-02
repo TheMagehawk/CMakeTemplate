@@ -14,6 +14,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Set Build Type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -46,6 +47,7 @@ if(CMAKE_BUILD_ANDROID AND ANDROID_NDK_PATH AND NOT BUILD_ANDROID_GRADLE)
 endif()
 
 # Set Version info
+#### <---- PUT YOUR PROJECT DESCRIPTION HERE ----> ####
 set(PROJECT_NAME "CMakeTemplate")
 set(PROJECT_VERSION 0.1.0)
 set(PROJECT_DESCRIPTION "A flexible, extensible and cross-platform CMake Template")
@@ -64,23 +66,24 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(LIBS_LOCAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
+# Set Windows Icon
+#### <---- PUT YOUR PROJECT ICON HERE ----> ####
 set(WINDOWS_ICON_RESOURCE ${RESOURCES_DIR}/icon.rc)
-option(USE_WINDOWS_ICON "Apply Icon on Windows Executable" ON)
 
-if(WIN32)
-    set(WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif()
-
+# Setup Project
 project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} DESCRIPTION ${PROJECT_DESCRIPTION} HOMEPAGE_URL ${PROJECT_URL} LANGUAGES CXX C)
 
+# Some Libraries need to compile ObjC on Apple Systems
 if(APPLE)
     enable_language(OBJC)
 endif()
 
+# Add Custom CMake Modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(FindPackageHandleStandardArgs)
 
+# Print Project info
 message(${PROJECT_NAME} " " ${PROJECT_VERSION})
 
 message(STATUS "CMake Version: ${CMAKE_VERSION}")
@@ -100,9 +103,9 @@ list(APPEND FOUND_PACKAGES "")
 list(APPEND NOT_FOUND_PACKAGES "")
 
 #### <---- ADD CUSTOM DEPENDENCIES HERE ----> ####
-option(HAVE_CUSTOM_CMAKE "Custom CMake Targets written in a custom CMakeLists.txt in the external directory" ON)
 list(APPEND LIBS_CUSTOM_CMAKE "")   # Specify which CMake Targets are defined inside the custom CMakeLists.txt
 
+#### <---- ADD PLATFORM-SPECIFIC DEPENDENCIES HERE ----> ####
 if(NOT ANDROID)
     list(APPEND LIBS "")
     list(APPEND LIBS_MINIMUM_VERSION "")
@@ -117,6 +120,9 @@ foreach(LIB_SHARED ${LIBS_SHARED})
     set(${LIB_SHARED}_USE_SHARED TRUE)
 endforeach()
 
+# Configure Library Setup Procedure
+# Search for already installed libaries (or only compile from source if wanted)
+# Compile needed libraries and use System Libraries if existent
 if(COMPILE_LIBS)
     message("Compiling all libraries from source...")
     list(APPEND NOT_FOUND_PACKAGES ${LIBS})
@@ -184,6 +190,7 @@ foreach(package ${NOT_FOUND_PACKAGES})
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR}/${package} EXCLUDE_FROM_ALL)
 endforeach()
 
+# Configure Libraries specified in custom CMakeLists.txt
 if(HAVE_CUSTOM_CMAKE)
     if(NOT EXISTS ${LIBS_LOCAL_INCLUDE_DIR} OR NOT IS_DIRECTORY ${LIBS_LOCAL_INCLUDE_DIR})
         message(FATAL_ERROR "Directory for custom CMake Targets doesn't exist: ${LIBS_LOCAL_INCLUDE_DIR}")
@@ -192,6 +199,7 @@ if(HAVE_CUSTOM_CMAKE)
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
 endif()
 
+# Search Android specific Libraries
 if(ANDROID)
     message("Android: Searching NDK Library \"log\"...")
     find_library( # Sets the name of the path variable.
@@ -202,6 +210,7 @@ if(ANDROID)
             log)
 endif()
 
+# Collect all source files inside project
 list(APPEND SOURCE_FILES
     ${SRC_DIR}/Main.cpp # C++ Example
     #${SRC_DIR}/Main.c   # C Example
@@ -214,13 +223,7 @@ if(EMSCRIPTEN)
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
 endif()
 
-if(WIN32 AND USE_WINDOWS_ICON)
-    add_executable(${PROJECT_NAME}
-        ${SOURCE_FILES}
-        ${WINDOWS_ICON_RESOURCE}
-    )
-else()
-    add_executable(${PROJECT_NAME}
+# Set Compile Target here
         ${SOURCE_FILES}
     )
 endif()
@@ -238,6 +241,7 @@ if(LIBS)
     message("")
 endif()
 
+# Include and link System Libraries
 foreach(package ${FOUND_PACKAGES})
     set(PACKAGE_UPPER "")
     string(TOUPPER ${package} PACKAGE_UPPER)
@@ -254,6 +258,7 @@ foreach(package ${FOUND_PACKAGES})
         )
 endforeach()
 
+# Include and link Compiled Libraries
 foreach(package ${NOT_FOUND_PACKAGES})
     set(PACKAGE_INCLUDE_DIR "")
     string(TOUPPER ${package} PACKAGE_INCLUDE_DIR)
@@ -282,11 +287,13 @@ if(${Threads_FOUND})
     )
 endif()
 
+# Link Dynamic Loading Library for the specific Platform
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_DL_LIBS}
 )
 
+# Link Android-specific Libraries
 if(ANDROID)
     target_link_libraries(${PROJECT_NAME}
         PRIVATE
@@ -295,6 +302,7 @@ if(ANDROID)
         EGL
         GLESv3
     )
+# Set Windows-specific Linking Options and Properties
 elseif(WIN32)
     # Hide Console for Windows
     if(HIDE_CONSOLE)
