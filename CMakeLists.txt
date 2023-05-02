@@ -245,6 +245,19 @@ if(EMSCRIPTEN)
 endif()
 
 # Set Compile Target here
+if(COMPILE_EXECUTABLE)
+    if(WIN32 AND USE_WINDOWS_ICON)
+        add_executable(${PROJECT_NAME}
+            ${SOURCE_FILES}
+            ${WINDOWS_ICON_RESOURCE}
+        )
+    else()
+        add_executable(${PROJECT_NAME}
+            ${SOURCE_FILES}
+        )
+    endif()
+else()
+    add_library(${PROJECT_NAME}
         ${SOURCE_FILES}
     )
 endif()
