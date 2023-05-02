@@ -97,6 +97,15 @@ message("")
 
 set(BUILD_SHARED_LIBS FALSE)
 set(POSITION_INDEPENDENT_CODE TRUE)
+if(WIN32)
+    set(WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+endif()
+
+#### <---- SET OPTIONS HERE ----> ####
+option(COMPILE_EXECUTABLE "Compile to Executable (or not: Library)" ON)
+option(USE_WINDOWS_ICON "Apply Icon on Windows Executable" ON)
+option(HAVE_CUSTOM_CMAKE "Custom CMake Targets written in a custom CMakeLists.txt in the external directory" ON)
+option(PREFER_PTHREAD "Prefer using the pthread Threading Library on Unix-like Systems" ON)
 
 #### <---- ADD ALL EXTERNAL DEPENDENCIES (INCLUDING CUSTOM) HERE ----> ####
 list(APPEND LIBS "")
