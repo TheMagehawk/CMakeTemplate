@@ -241,7 +241,7 @@ list(APPEND SOURCE_FILES
 
 # Compile HTML File for Emscripten Builds
 if(EMSCRIPTEN)
-	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
 endif()
 
 # Set Compile Target here
@@ -386,7 +386,7 @@ endif()
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set(EXECUTABLE_NAME ${EXECUTABLE_NAME}${PROJECT_DEBUG_POSTFIX})
+    set(EXECUTABLE_NAME ${EXECUTABLE_NAME}${PROJECT_DEBUG_POSTFIX})
 endif()
 
 # Tests
@@ -400,9 +400,9 @@ add_test(NAME ${TEST_NAME} COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${EXECUTABL
 # Installation Rules
 #### <---- INSTALL TARGET RULES ----> ####
 if(WIN32)
-	set(INSTALL_PATH "")
+    set(INSTALL_PATH "")
 else()
-	set(INSTALL_PATH bin)
+    set(INSTALL_PATH bin)
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${INSTALL_PATH})
