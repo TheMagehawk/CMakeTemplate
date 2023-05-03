@@ -2,7 +2,7 @@
 DisableFormat: false
 
 Language: Cpp
-Standard: C++20
+Standard: c++20
 
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: true
