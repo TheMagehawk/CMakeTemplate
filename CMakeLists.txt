@@ -1,15 +1,18 @@
-cmake_minimum_required(VERSION 3.12)    # Min Version for C++20 Support
+cmake_minimum_required(VERSION 3.12) # Min Version for C++20 Support
 
 # Set Policies to use new behaviour
-if (POLICY CMP0025)
+if(POLICY CMP0025)
     cmake_policy(SET CMP0025 NEW)
-endif ()
-if (POLICY CMP0067)
+endif()
+
+if(POLICY CMP0067)
     cmake_policy(SET CMP0067 NEW)
 endif()
-if (POLICY CMP0074)
+
+if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
+
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -22,15 +25,14 @@ endif()
 # Android NDK Setup
 if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
     if(NOT ANDROID_NDK_PATH)
-        message("No Android NDK Path set! Using environment variable: " $ENV{ANDROID_NDK_HOME})
         set(ANDROID_NDK_PATH $ENV{ANDROID_NDK_HOME})
 
         if(ANDROID_NDK_PATH)
             # Replace Backslashes in NDK Path
-            STRING(REGEX REPLACE "\\\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH} )
-            STRING(REGEX REPLACE "\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH})
+            STRING(REGEX REPLACE "\\\\" "/" ANDROID_NDK_PATH ${ANDROID_NDK_PATH})
+            message("No Android NDK Path set! Using environment variable: ${ANDROID_NDK_PATH}")
         else()
-            message(FATAL_ERROR "No Android NDK Path specified!")
+            message(FATAL_ERROR "No Android NDK Path found! You could try setting an environment variable...")
         endif()
     endif()
 endif()
@@ -97,6 +99,7 @@ message("")
 
 set(BUILD_SHARED_LIBS FALSE)
 set(POSITION_INDEPENDENT_CODE TRUE)
+
 if(WIN32)
     set(WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif()
@@ -110,12 +113,12 @@ option(PREFER_PTHREAD "Prefer using the pthread Threading Library on Unix-like S
 #### <---- ADD ALL EXTERNAL DEPENDENCIES (INCLUDING CUSTOM) HERE ----> ####
 list(APPEND LIBS "")
 list(APPEND LIBS_MINIMUM_VERSION "")
-list(APPEND LIBS_SHARED "")	# Mainly for LGPL-Licensed Libraries
+list(APPEND LIBS_SHARED "")    # Mainly for LGPL-Licensed Libraries
 list(APPEND FOUND_PACKAGES "")
 list(APPEND NOT_FOUND_PACKAGES "")
 
 #### <---- ADD CUSTOM DEPENDENCIES HERE ----> ####
-list(APPEND LIBS_CUSTOM_CMAKE "")   # Specify which CMake Targets are defined inside the custom CMakeLists.txt
+list(APPEND LIBS_CUSTOM_CMAKE "")    # Specify which CMake Targets are defined inside the custom CMakeLists.txt
 
 #### <---- ADD PLATFORM-SPECIFIC DEPENDENCIES HERE ----> ####
 if(NOT ANDROID)
@@ -194,7 +197,7 @@ foreach(package ${NOT_FOUND_PACKAGES})
     else()
         set(BUILD_SHARED_LIBS FALSE)
     endif()
-        
+
     if(NOT EXISTS ${LIBS_LOCAL_INCLUDE_DIR}/${package} OR NOT IS_DIRECTORY ${LIBS_LOCAL_INCLUDE_DIR}/${package})
         message(FATAL_ERROR "${package} doesn't exist in ${LIBS_LOCAL_INCLUDE_DIR}/${package}! Maybe git submodules need to be initialized?")
     endif()
@@ -210,7 +213,7 @@ if(HAVE_CUSTOM_CMAKE)
 
     add_subdirectory(${LIBS_LOCAL_INCLUDE_DIR} EXCLUDE_FROM_ALL)
 endif()
-    
+
 # Use pthread on Unix-like Systems
 if(PREFER_PTHREAD)
     if(UNIX)
@@ -224,17 +227,17 @@ find_package(Threads QUIET)
 if(ANDROID)
     message("Android: Searching NDK Library \"log\"...")
     find_library( # Sets the name of the path variable.
-            log-lib
+        log-lib
 
-            # Specifies the name of the NDK library that
-            # you want CMake to locate.
-            log)
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log)
 endif()
 
 # Collect all source files inside project
 list(APPEND SOURCE_FILES
-    ${SRC_DIR}/Main.cpp # C++ Example
-    #${SRC_DIR}/Main.c   # C Example
+    ${SRC_DIR}/Main.cpp    # C++ Example
+    #${SRC_DIR}/Main.c     # C Example
 
     #### <---- ADD YOUR OWN SOURCE FILES HERE ----> ####
 )
@@ -267,7 +270,7 @@ target_include_directories(${PROJECT_NAME}
     ${SRC_DIR}
     ${LIBS_LOCAL_INCLUDE_DIR}
     PUBLIC
-    #${SRC_DIR}
+    ${SRC_DIR}
     ${LIBS_LOCAL_INCLUDE_DIR}
 )
 
@@ -287,9 +290,9 @@ foreach(package ${FOUND_PACKAGES})
     )
 
     message("Linking System Library " ${package} ": " ${${PACKAGE_UPPER}_LIBRARIES})
-        target_link_libraries(${PROJECT_NAME} PUBLIC
-            ${${PACKAGE_UPPER}_LIBRARIES}
-        )
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${${PACKAGE_UPPER}_LIBRARIES}
+    )
 endforeach()
 
 # Include and link Compiled Libraries
@@ -304,7 +307,7 @@ foreach(package ${NOT_FOUND_PACKAGES})
     )
 
     target_link_libraries(${PROJECT_NAME} PUBLIC
-            ${package}
+        ${package}
     )
 endforeach()
 
@@ -357,7 +360,7 @@ if(CMAKE_BUILD_ANDROID AND NOT BUILD_ANDROID_GRADLE)
 endif()
 
 # if(EMSCRIPTEN)
-#     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} "-s EMCC_DEBUG=1")
+# set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} "-s EMCC_DEBUG=1")
 # endif()
 
 # Set C++ Version for target/executable
@@ -376,11 +379,11 @@ endif()
 
 # Copy Resources into output folder of the executable after successful build
 #### <---- HERE YOU CAN COPY FILES AND DIRECTORIES INTO OUTPUT DIRECTORY ----> #####
-#add_custom_command(
-#	TARGET ${PROJECT_NAME} POST_BUILD
-#	COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-#	VERBATIM
-#)
+# add_custom_command(
+# TARGET ${PROJECT_NAME} POST_BUILD
+# COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+# VERBATIM
+# )
 
 # Set Executable Name for CTest Configuration
 set(EXECUTABLE_NAME ${PROJECT_NAME})
