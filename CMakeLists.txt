@@ -115,6 +115,7 @@ list(APPEND LIBS "")
 list(APPEND LIBS_MINIMUM_VERSION "")
 list(APPEND LIBS_SHARED "")    # Mainly for LGPL-Licensed Libraries
 
+#### <---- DO NOT ADD PACKAGES HERE ----> ####
 list(APPEND FOUND_PACKAGES "")
 list(APPEND NOT_FOUND_PACKAGES "")
 
